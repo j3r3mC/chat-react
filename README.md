@@ -67,4 +67,26 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 ### `npm run build` fails to minify
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# Chat App
+
+## Architecture
+
+chat-app/
+│── src/               # Code source React
+│   ├── components/    # Composants réutilisables (Boutons, Formulaires, Modals)
+│   ├── pages/         # Pages principales (Login, Register, Home, Chat)
+│   ├── services/      # Gestion des requêtes API (authentification, récupération des channels)
+│   ├── context/       # Gestion du contexte global (authentification, état du chat)
+│   ├── hooks/         # Hooks personnalisés (gestion du JWT, requêtes API)
+│   ├── utils/         # Fonctions utilitaires (formatage, validation, sécurité)
+│   ├── styles/        # Fichiers de styles (CSS, SCSS ou styled-components)
+│   ├── routers/       # Configuration de React Router
+│   ├── App.js         # Point d’entrée de l’application
+│   ├── index.js       # Rendu React et intégration du router
+    │── setupTests.js  # Fichier de configuration pour les tests
+│── public/            # Fichiers statiques (index.html, favicon)
+│── package.json       # Dépendances et scripts de l’application
+│── .env               # Variables d’environnement (URL API, clés secrètes)
+│── README.md          # Documentation du projet
+
+
