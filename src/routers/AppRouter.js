@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route/*, Navigate */} from "react-rout
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Home from "../pages/Home";
+import AdminRegister from "../pages/AdminRegister";
+import ProtectedRoute from "../components/ProtectedRoute"; // 🔥 Modifier le chemin ici
 
 
 
@@ -11,6 +13,8 @@ function AppRouter() {
             <Routes>
                 <Route path="/" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/register-admin" element={<ProtectedRoute allowedRoles={["superadmin"]}><AdminRegister /></ProtectedRoute>} />
+
                 <Route path="/home" element={<Home />} />
             </Routes>
         </Router>
