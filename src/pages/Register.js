@@ -20,7 +20,7 @@ function Register() {
 
     if (response.ok) {
       alert("Compte créé avec succès !");
-      navigate("/login"); // Redirige vers la connexion
+      navigate("/"); // Redirige vers la connexion
     } else {
       alert("Erreur d'inscription : " + data.message);
     }
