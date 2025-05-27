@@ -16,7 +16,7 @@ function Home() {
             setRole(userRole); // ✅ Stocke le rôle pour gérer l'affichage
         }
 
-        // 🔥 Récupérer la liste des channels au chargement de la page
+        // 🔥 Récupérer la liste des channels
         const fetchChannels = async () => {
             const response = await fetch("http://localhost:5000/api/admin/channels");
             const data = await response.json();
@@ -30,15 +30,19 @@ function Home() {
         <div>
             <h2>Bienvenue ! 🎉</h2>
 
-            {/* 🔥 Affichage de tous les channels pour tout le monde */}
+            {/* 🔥 Affichage de tous les channels */}
             <h3>Liste des Channels</h3>
             <ul>
                 {channels.map(channel => (
-                    <li key={channel.id}>{channel.name} - {channel.type}</li>
+                    <li key={channel.id}>
+                        <button onClick={() => navigate(`/chat/${channel.id}`)}>
+                            {channel.name} - {channel.type}
+                        </button>
+                    </li>
                 ))}
             </ul>
 
-            {/* 🔥 Ce bouton est visible uniquement pour les admins */}
+            {/* 🔥 Bouton visible uniquement pour les admins */}
             {role === "admin" && (
                 <button onClick={() => navigate("/create-channel")}>Créer un Channel</button>
             )}
