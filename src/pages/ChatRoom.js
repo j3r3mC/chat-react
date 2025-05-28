@@ -113,14 +113,15 @@ function ChatRoom() {
     <div>
       <h2>Salon de discussion - Channel {channelId}</h2>
       {messages.length > 0 ? (
-        <ul>
-          {messages.map((msg) => (
-            <li key={msg.id}>
-              <strong>{msg.user_id}</strong>: {msg.content}{" "}
-              <em>({new Date(msg.created_at).toLocaleString()})</em>
-            </li>
-          ))}
-        </ul>
+       <ul>
+  {messages.map((msg) => (
+    <li key={msg.id}>
+      <strong>{msg.username || "Utilisateur inconnu"}</strong>: {msg.content}{" "}
+      <em>({new Date(msg.created_at).toLocaleString()})</em>
+    </li>
+  ))}
+</ul>
+
       ) : (
         <p>Aucun message disponible ou en cours de chargement...</p>
       )}
