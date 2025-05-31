@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   const navigate = useNavigate();
-  const [role, setRole] = useState("");
-  const [channels, setChannels] = useState([]);
-  const [joinedChannels, setJoinedChannels] = useState([]);
+  const [role, setRole] = useState(""); // Stocke le rôle de l'utilisateur
+  const [channels, setChannels] = useState([]); // Stocke les canaux
+  const [joinedChannels, setJoinedChannels] = useState([]); // Stocke les canaux rejoints
   const [users, setUsers] = useState([]); // Stocke la liste des utilisateurs
 
   useEffect(() => {
@@ -18,7 +18,7 @@ function Home() {
       setRole(userRole);
     }
 
-    // Récupérer la liste des channels
+    // 🔍 Récupération des channels
     const fetchChannels = async () => {
       try {
         const response = await fetch("http://localhost:5000/api/channels/all");
@@ -31,35 +31,31 @@ function Home() {
         console.error("Erreur lors de la récupération des channels :", error);
       }
     };
-
     fetchChannels();
 
-    // Si l'utilisateur est admin, récupérer la liste des utilisateurs
-    if (userRole === "admin") {
-      const fetchUsers = async () => {
-        try {
-          const response = await fetch("http://localhost:5000/api/admin/users", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (!response.ok) {
-            throw new Error(`Erreur HTTP (${response.status}): ${await response.text()}`);
-          }
-          const data = await response.json();
-          setUsers(data);
-        } catch (error) {
-          console.error("Erreur lors de la récupération des utilisateurs :", error);
+    // 🔍 Récupération des utilisateurs
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/admin/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP (${response.status}): ${await response.text()}`);
         }
-      };
-
-      fetchUsers();
-    }
+        const data = await response.json();
+        setUsers(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des utilisateurs :", error);
+      }
+    };
+    fetchUsers();
   }, [navigate]);
 
+  // 🔥 Fonction pour rejoindre un canal
   const joinChannel = async (channelId) => {
     const token = localStorage.getItem("token");
-    console.log("Tentative de rejoindre le canal avec ID :", channelId);
     try {
       const response = await fetch("http://localhost:5000/api/channels/join", {
         method: "POST",
@@ -69,14 +65,9 @@ function Home() {
         },
         body: JSON.stringify({ channelId }),
       });
-      console.log("Réponse de l'API join:", response);
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erreur joinChannel (API):", errorData);
-        throw new Error(errorData.message || "Erreur lors de la jonction");
+        throw new Error("Erreur lors de la jonction");
       }
-      const data = await response.json();
-      console.log("Rejoint canal avec succès :", data);
       setJoinedChannels((prev) => [...prev, channelId]);
       navigate(`/chat/${channelId}`);
     } catch (error) {
@@ -84,6 +75,7 @@ function Home() {
     }
   };
 
+  // 🔥 Fonction pour supprimer un utilisateur (accessible uniquement aux admins)
   const deleteUser = async (userId) => {
     const token = localStorage.getItem("token");
     try {
@@ -94,18 +86,19 @@ function Home() {
         },
       });
       if (!response.ok) {
-        throw new Error(`Erreur HTTP (${response.status}): ${await response.text()}`);
+        throw new Error("Erreur lors de la suppression");
       }
-      console.log(`✅ Utilisateur ${userId} supprimé`);
-      setUsers(users.filter(user => user.id !== userId)); // Met à jour la liste des utilisateurs
+      setUsers(users.filter(user => user.id !== userId)); // Met à jour la liste
     } catch (error) {
-      console.error("❌ Erreur lors de la suppression de l'utilisateur :", error);
+      console.error("Erreur lors de la suppression de l'utilisateur :", error);
     }
   };
 
   return (
     <div>
       <h2>Bienvenue ! 🎉</h2>
+      
+      {/* 🔥 Liste des Channels */}
       <h3>Liste des Channels</h3>
       <ul>
         {channels.map((channel) => (
@@ -115,35 +108,30 @@ function Home() {
             </span>
             {" "}
             {joinedChannels.includes(channel.id) ? (
-              <button onClick={() => navigate(`/chat/${channel.id}`)}>
-                Entrer
-              </button>
+              <button onClick={() => navigate(`/chat/${channel.id}`)}>Entrer</button>
             ) : (
-              <button onClick={() => joinChannel(channel.id)}>
-                Rejoindre
-              </button>
+              <button onClick={() => joinChannel(channel.id)}>Rejoindre</button>
             )}
           </li>
         ))}
       </ul>
 
-      {/* Liste des utilisateurs visible uniquement pour les admins */}
-      {role === "admin" && (
-        <>
-          <h3>Utilisateurs Inscrits</h3>
-          <ul>
-            {users.map(user => (
-              <li key={user.id}>
-                {user.username} {" "}
-                <button onClick={() => deleteUser(user.id)}>❌ Supprimer</button>
-              </li>
-            ))}
-          </ul>
+      {/* 🔥 Liste des utilisateurs (visible par tous) */}
+      <h3>Utilisateurs Inscrits</h3>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>
+            {user.username} {" "}
+            {role === "admin" && (
+              <button onClick={() => deleteUser(user.id)}>❌ Supprimer</button>
+            )}
+          </li>
+        ))}
+      </ul>
 
-          <button onClick={() => navigate("/create-channel")}>
-            Créer un Channel
-          </button>
-        </>
+      {/* 🔥 Options supplémentaires pour les admins */}
+      {role === "admin" && (
+        <button onClick={() => navigate("/create-channel")}>Créer un Channel</button>
       )}
     </div>
   );
