@@ -75,6 +75,25 @@ function Home() {
     }
   };
 
+  // 🔥 Fonction pour supprimer un channel (accessible uniquement aux admins)
+  const deleteChannel = async (channelId) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`http://localhost:5000/api/channels/channel/${channelId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression");
+      }
+      setChannels(channels.filter(channel => channel.id !== channelId)); // Met à jour la liste
+    } catch (error) {
+      console.error("Erreur lors de la suppression du channel :", error);
+    }
+  };
+
   // 🔥 Fonction pour supprimer un utilisateur (accessible uniquement aux admins)
   const deleteUser = async (userId) => {
     const token = localStorage.getItem("token");
@@ -105,12 +124,16 @@ function Home() {
           <li key={channel.id} style={{ marginBottom: "1rem" }}>
             <span>
               {channel.name} - {channel.type} - {channel.access}
-            </span>
-            {" "}
+            </span>{" "}
             {joinedChannels.includes(channel.id) ? (
               <button onClick={() => navigate(`/chat/${channel.id}`)}>Entrer</button>
             ) : (
               <button onClick={() => joinChannel(channel.id)}>Rejoindre</button>
+            )}
+
+            {/* 🔥 Le bouton "Supprimer" est visible uniquement pour les admins */}
+            {role === "admin" && (
+              <button onClick={() => deleteChannel(channel.id)}>❌ Supprimer</button>
             )}
           </li>
         ))}
