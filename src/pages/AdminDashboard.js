@@ -1,28 +1,37 @@
 import { useEffect, useState } from "react";
 
 function AdminDashboard() {
-    const [channels, setChannels] = useState([]);
+  const [channels, setChannels] = useState([]);
 
-    useEffect(() => {
-        const fetchChannels = async () => {
-            const response = await fetch("http://localhost:5000/api/admin/channels");
-            const data = await response.json();
-            setChannels(data);
-        };
+  useEffect(() => {
+    const fetchChannels = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/channels/all");
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP (${response.status})`);
+        }
+        const data = await response.json();
+        setChannels(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des channels :", error);
+      }
+    };
 
-        fetchChannels();
-    }, []);
+    fetchChannels();
+  }, []);
 
-    return (
-        <div>
-            <h2>Gestion des Channels</h2>
-            <ul>
-                {channels.map(channel => (
-                    <li key={channel.id}>{channel.name} - {channel.type}</li>
-                ))}
-            </ul>
-        </div>
-    );
+  return (
+    <div>
+      <h2>Gestion des Channels</h2>
+      <ul>
+        {channels.map((channel) => (
+          <li key={channel.id}>
+            {channel.name} - {channel.type}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export default AdminDashboard;
