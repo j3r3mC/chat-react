@@ -7,14 +7,14 @@ const socket = io("http://localhost:3002");
 function ChatRoom() {
   const { channelId } = useParams();
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMsg, setNewMsg] = useState("");
+  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    // Récupération de l'historique via l'API
+    // Récupération initiale des messages via l'API
     const fetchMessages = async () => {
-      const token = localStorage.getItem("token");
       if (!token) {
-        console.error("❌ Aucun token trouvé, redirection vers la connexion.");
         window.location.href = "/login";
         return;
       }
@@ -23,50 +23,56 @@ function ChatRoom() {
           method: "GET",
           headers: { "Authorization": `Bearer ${token}` },
         });
-        if (!response.ok) {
-          console.error(`❌ Erreur API (${response.status}): ${await response.text()}`);
-          return;
-        }
         const data = await response.json();
         console.log("🕰️ Messages reçus via API :", data);
-        // Remplace complètement l'état des messages avec l'historique récupéré
         setMessages(data);
       } catch (error) {
-        console.error("❌ Erreur de récupération des messages :", error);
+        console.error("❌ Erreur lors de la récupération des messages :", error);
       }
     };
 
     fetchMessages();
 
-    // Rejoindre le canal en indiquant de ne pas récupérer l'historique via WebSocket
-    socket.emit("join channel", { channel_id: channelId, skipHistory: true });
+    // Rejoindre le canal pour recevoir les événements WebSocket
+    socket.emit("join channel", { channel_id: channelId });
 
-    // Réception des nouveaux messages en temps réel
-    const handleChatMessage = (msg) => {
-      console.log("📩 Nouveau message reçu via WebSocket :", msg);
-      if (msg && msg.content) {
-        setMessages((prevMessages) => {
-          // On ajoute le message s'il n'existe pas déjà (vérification par id)
-          if (!prevMessages.some((m) => m.id === msg.id)) {
-            return [...prevMessages, msg];
-          }
-          return prevMessages;
-        });
+    // Écoute des nouveaux messages en temps réel
+    socket.on("chat message", (msg) => {
+      setMessages((prevMessages) =>
+        prevMessages.some((m) => m.id === msg.id) ? prevMessages : [...prevMessages, msg]
+      );
+    });
+
+    // ✅ Correction : Écoute de l'événement de suppression d'un message individuel avec conversion
+    socket.on("delete message", ({ messageId }) => {
+      console.log(`🗑️ Suppression reçue via WebSocket : message ID ${messageId}`);
+
+      setMessages((prevMessages) => {
+        const updatedMessages = prevMessages.filter((msg) => msg.id !== Number(messageId));
+        console.log("🔄 Messages mis à jour après suppression :", updatedMessages);
+        return [...updatedMessages]; // Force la mise à jour en créant un nouvel array
+      });
+    });
+
+    // ✅ Réintégration de l'événement de suppression de tous les messages
+    socket.on("delete all messages", ({ channelId: chId }) => {
+      if (chId === channelId) {
+        console.log("🗑️ Suppression de tous les messages reçue pour ce channel");
+        setMessages([]);
       }
-    };
+    });
 
-    socket.on("chat message", handleChatMessage);
-
-    // Nettoyage de l'écouteur lors du démontage
     return () => {
-      socket.off("chat message", handleChatMessage);
+      socket.off("chat message");
+      socket.off("delete message");
+      socket.off("delete all messages");
     };
-  }, [channelId]);
+  }, [channelId, token]);
 
+  // ✅ Ajout de l'input pour envoyer des messages
   const sendMessage = async () => {
-    const token = localStorage.getItem("token");
     if (!token) {
-      alert("❌ Aucun token trouvé, merci de vous reconnecter.");
+      alert("Veuillez vous reconnecter.");
       return;
     }
     try {
@@ -74,64 +80,86 @@ function ChatRoom() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ content: newMessage, channel_id: channelId }),
+          "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ content: newMsg, channel_id: channelId }),
       });
       if (!response.ok) {
-        console.error(
-          `❌ Erreur lors de l'envoi du message (${response.status}): ${await response.text()}`
-        );
-        alert("Erreur d'envoi du message.");
+        console.error("❌ Erreur lors de l'envoi du message :", await response.text());
         return;
       }
       const data = await response.json();
       console.log("✅ Message envoyé :", data);
-      if (data.content) {
-        // SUPPRESSION : Ne pas émettre le message via socket depuis le client.
-        // Le serveur émet déjà le message après insertion dans la base.
-        /*
-        socket.emit("chat message", data);
-        */
-        // Mise à jour locale si nécessaire (vérification par id)
-        setMessages((prevMessages) => {
-          if (!prevMessages.some((m) => m.id === data.id)) {
-            return [...prevMessages, data];
-          }
-          return prevMessages;
-        });
-        setNewMessage("");
-      } else {
-        alert(data.message || "Échec de l'envoi du message");
-      }
+      setNewMsg("");
     } catch (error) {
       console.error("❌ Erreur lors de l'envoi du message :", error);
     }
   };
 
+  const handleDeleteMessage = async (msgId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/chat/message/${msgId}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      if (!response.ok) {
+        console.error("❌ Erreur lors de la suppression du message");
+      }
+    } catch (error) {
+      console.error("❌ Erreur lors de l'appel API pour la suppression :", error);
+    }
+  };
+
+  // ✅ Réintégration de la fonction pour supprimer tous les messages du canal
+  const handleDeleteAllMessages = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/chat/messages/channel/${channelId}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      if (!response.ok) {
+        console.error("❌ Erreur lors de la suppression de tous les messages");
+      }
+    } catch (error) {
+      console.error("❌ Erreur lors de l'appel API pour la suppression de tous les messages :", error);
+    }
+  };
+
   return (
     <div>
-      <h2>Salon de discussion - Channel {channelId}</h2>
-      {messages.length > 0 ? (
-       <ul>
-  {messages.map((msg) => (
-    <li key={msg.id}>
-      <strong>{msg.username || "Utilisateur inconnu"}</strong>: {msg.content}{" "}
-      <em>({new Date(msg.created_at).toLocaleString()})</em>
-    </li>
-  ))}
-</ul>
-
-      ) : (
-        <p>Aucun message disponible ou en cours de chargement...</p>
+      <h2>Salon - Channel {channelId}</h2>
+      
+      {role === "admin" && (
+        <div style={{ marginBottom: "1rem" }}>
+          <button onClick={handleDeleteAllMessages}>
+            Supprimer tous les messages
+          </button>
+        </div>
       )}
-      <input
-        type="text"
-        placeholder="Écrire un message..."
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-      />
-      <button onClick={sendMessage}>Envoyer</button>
+
+      <ul>
+        {messages.map((msg) => (
+          <li key={msg.id}>
+            <strong>{msg.username}</strong>: {msg.content}{" "}
+            <em>({new Date(msg.created_at).toLocaleString()})</em>
+            {role === "admin" && (
+              <button onClick={() => handleDeleteMessage(msg.id)}>
+                🗑️ Supprimer
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+      
+      {/* ✅ Correction du champ d'envoi de messages */}
+      <div>
+        <input
+          type="text"
+          placeholder="Écrire un message..."
+          value={newMsg}
+          onChange={(e) => setNewMsg(e.target.value)}
+        />
+        <button onClick={sendMessage}>Envoyer</button>
+      </div>
     </div>
   );
 }
