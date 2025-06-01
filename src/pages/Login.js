@@ -20,11 +20,19 @@ function Login(){
         if(response.ok){
             localStorage.setItem("token", data.token);
             localStorage.setItem("role", data.role);
-            localStorage.setItem("userId", data.userId);
+            localStorage.setItem("user_id", data.userId); // ✅ Correction de la clé
+
+            console.log("📥 Stockage réussi dans localStorage :", {
+                token: localStorage.getItem("token"),
+                role: localStorage.getItem("role"),
+                user_id: localStorage.getItem("user_id")
+});
+
             navigate("/home");
         } else {
             alert(data.message || "Échec de la connexion");
         }
+
     };
 
     return (
