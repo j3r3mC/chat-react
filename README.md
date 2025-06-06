@@ -89,4 +89,28 @@ chat-app/
 │── .env               # Variables d’environnement (URL API, clés secrètes)
 │── README.md          # Documentation du projet
 
+📂 private-message-service/ (Microservice dédié aux messages privés)
+ ├── 📜 server.js → Fichier principal du serveur
+ ├── 📜 .env → Variables d'environnement (ports, clés)
 
+📂 security/ (Gestion du cryptage RSA)
+ │ ├── 📜 cryptoUtils.js → Fonctions de chiffrement/déchiffrement
+ │ ├── 📂 keys/ → Stockage sécurisé des clés RSA
+ │ ├── 🔑 private.pem → Clé privée RSA-2
+ │ ├── 🔓 public.pem → Clé publique RSA-2
+
+📂 db/ (Connexion et requêtes MySQL)
+ │ ├── 📜 db.js → Gestion des connexions à MySQL
+
+📂 api/ (Définition des routes API)
+ │ ├── 📜 privateMessageRoutes.js → Routes pour les messages privés
+
+📂 controllers/ (Gestion des fonctionnalités)
+ │ ├── 📜 privateMessageController.js → Logique d'envoi/réception des MP
+
+📂 middleware/ (Protection et validation des requêtes)
+ │ ├── 📜 authMiddleware.js → Vérification du JWT
+ │ ├── 📜 verifyAuthor.js → Vérification du propriétaire du MP
+
+📂 sockets/ (Gestion du temps réel)
+ │ ├── 📜 privateMessageSocket.js → Événements WebSocket pour MP

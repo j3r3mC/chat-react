@@ -7,6 +7,7 @@ function Home() {
   const [channels, setChannels] = useState([]); // Stocke les canaux
   const [joinedChannels, setJoinedChannels] = useState([]); // Stocke les canaux rejoints
   const [users, setUsers] = useState([]); // Stocke la liste des utilisateurs
+  const [privateChats, setPrivateChats] = useState([]); // Stocke les discussions privées
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -51,6 +52,27 @@ function Home() {
       }
     };
     fetchUsers();
+
+    // 🔍 Récupération des discussions privées
+    const fetchPrivateChats = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch("http://localhost:5000/api/private-messages/conversations", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur lors de la récupération des discussions privées");
+    }
+
+    const data = await response.json();
+    setPrivateChats(data.conversations); // 🔥 Assure-toi que `data.conversations` est bien défini
+  } catch (error) {
+    console.error("Erreur lors de la récupération des discussions privées :", error);
+  }
+};
+
+    fetchPrivateChats();
   }, [navigate]);
 
   // 🔥 Fonction pour rejoindre un canal
@@ -116,7 +138,33 @@ function Home() {
   return (
     <div>
       <h2>Bienvenue ! 🎉</h2>
-      
+
+      {/* 🔥 Liste des utilisateurs avec bouton MP */}
+      <h3>Utilisateurs Inscrits</h3>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>
+            {user.username}{" "}
+            <button onClick={() => navigate(`/private-chat/${user.id}`)}>💬 MP</button>
+            {role === "admin" && (
+              <button onClick={() => deleteUser(user.id)}>❌ Supprimer</button>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {/* 🔥 Liste des discussions privées */}
+      <h3>💬 Discussions Privées</h3>
+      <ul>
+        {privateChats.map(chat => (
+          <li key={chat.id}>
+            <button onClick={() => navigate(`/private-chat/${chat.interlocutorId}`)}>
+              💬 {chat.interlocutorName}
+            </button>
+          </li>
+        ))}
+      </ul>
+
       {/* 🔥 Liste des Channels */}
       <h3>Liste des Channels</h3>
       <ul>
@@ -130,8 +178,6 @@ function Home() {
             ) : (
               <button onClick={() => joinChannel(channel.id)}>Rejoindre</button>
             )}
-
-            {/* 🔥 Le bouton "Supprimer" est visible uniquement pour les admins */}
             {role === "admin" && (
               <button onClick={() => deleteChannel(channel.id)}>❌ Supprimer</button>
             )}
@@ -139,20 +185,6 @@ function Home() {
         ))}
       </ul>
 
-      {/* 🔥 Liste des utilisateurs (visible par tous) */}
-      <h3>Utilisateurs Inscrits</h3>
-      <ul>
-        {users.map(user => (
-          <li key={user.id}>
-            {user.username} {" "}
-            {role === "admin" && (
-              <button onClick={() => deleteUser(user.id)}>❌ Supprimer</button>
-            )}
-          </li>
-        ))}
-      </ul>
-
-      {/* 🔥 Options supplémentaires pour les admins */}
       {role === "admin" && (
         <button onClick={() => navigate("/create-channel")}>Créer un Channel</button>
       )}
