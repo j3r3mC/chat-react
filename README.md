@@ -1,116 +1,130 @@
-# Getting Started with Create React App
+# custom_chat - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**custom_chat** est une application de chat personnalisée qui permet d’échanger des messages en temps réel (publics et privés) ainsi que de partager des fichiers. Ce front-end, développé en React, communique avec l’API Gateway pour interagir avec l’ensemble des services backend.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Table des Matières
 
-### `npm start`
+- [Vue d'Ensemble](#vue-densemble)
+- [Architecture Frontend](#architecture-frontend)
+- [Structure du Projet](#structure-du-projet)
+- [Fonctionnalités](#fonctionnalités)
+- [Endpoints et Intégration](#endpoints-et-intégration)
+- [Installation et Déploiement](#installation-et-déploiement)
+- [Technologies Utilisées](#technologies-utilisées)
+- [Licence](#licence)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Vue d'Ensemble
 
-### `npm test`
+Le front-end de **custom_chat** offre une interface utilisateur intuitive pour :
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Se connecter et s'inscrire.
+- Participer aux chats publics via différents channels.
+- Échanger des messages privés, où les messages texte sont décryptés pour l’affichage (les données sensibles ayant été cryptées côté serveur).
+- Envoyer et recevoir des fichiers (les images et documents sont affichés en prévisualisation et téléchargeables).
 
-### `npm run build`
+L’application utilise React avec React Router pour la navigation et Socket.io pour les mises à jour en temps réel.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Architecture Frontend
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Le front-end est organisé autour de composants React modulaires, de pages pour chaque vue importante ainsi que de services pour centraliser les appels API. La communication avec l’API Gateway se fait via des appels HTTP ainsi qu’en temps réel via Socket.io.
 
-### `npm run eject`
+```plaintext
+custom_chat-frontend/
+├── build/                 # Le build compilé de l'application
+├── node_modules/          # Dépendances installées
+├── public/                # Fichiers statiques (index.html, images, etc.)
+│   └── index.html         # Point d'entrée HTML
+└── src/
+    ├── components/        # Composants réutilisables (boutons, formulaires, etc.)
+    ├── context/           # Contextes React pour la gestion de l'état global (authentification, thème, etc.)
+    ├── hooks/             # Hooks custom pour simplifier la logique réutilisable
+    ├── pages/             # Pages de l'application (Home, Login, ChatRoom, PrivateChat, etc.)
+    ├── routers/           # Configuration du routeur avec React Router (ex. AppRouter.js)
+    ├── services/          # Services pour les appels API vers le backend
+    ├── styles/            # Feuilles de styles CSS / SCSS
+    ├── utils/             # Fonctions utilitaires
+    ├── App.js             # Composant principal de l'application
+    └── index.js           # Point d'entrée JavaScript
+Fonctionnalités
+Interface Utilisateur Moderne : Conçue en React, l’interface est responsive et offre une navigation intuitive entre les différentes pages (login, chat public, discussions privées, etc.).
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Chats Publics et Privés :
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Participation aux channels publics créés et gérés par des administrateurs.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Discussions privées sécurisées, où les messages texte sont cryptés côté serveur (via RSA) et décryptés au moment de l’affichage.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Partage de Fichiers : Les utilisateurs peuvent envoyer des fichiers dans les chats ; ces fichiers sont affichés en prévisualisation dans le cas d’images et sont téléchargeables.
 
-## Learn More
+Temps Réel via Socket.io : Les mises à jour en temps réel et les notifications de nouveaux messages sont gérées grâce à Socket.io..
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Endpoints et Intégration
+Le front-end interagit avec le backend via l’API Gateway qui centralise les requêtes vers les microservices. Par exemple :
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Pour l'authentification : POST /api/auth/login et POST /api/auth/register
 
-### Code Splitting
+Pour récupérer les messages publics et privés ainsi que pour envoyer des messages, le front-end utilise les endpoints fournis par les services Chat et Private Message.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Les fichiers uploadés sont accessibles via l’URL : http://localhost:5000/upload/{fileName}
 
-### Analyzing the Bundle Size
+Les appels API sont regroupés dans le dossier src/services pour faciliter la maintenance et l’évolution de l'intégration.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Installation et Déploiement
+Prérequis
+Node.js (v14+)
 
-### Making a Progressive Web App
+npm ou yarn
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Installation
+Cloner le Repository :
 
-### Advanced Configuration
+bash
+git clone https://votre-repository-url.git
+cd custom_chat-frontend
+Installer les Dépendances :
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+bash
+npm install
+# ou
+yarn install
+Configuration :
 
-### Deployment
+Vérifiez que le fichier .env (si utilisé) contient les configurations nécessaires (URL de l’API Gateway, etc.).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Lancement
+En Mode Développement :
 
-### `npm run build` fails to minify
+bash
+npm start
+# ou
+yarn start
+Build pour Production :
 
-# Chat App
+bash
+npm run build
+# ou
+yarn build
+Le build sera généré dans le dossier build/, que vous pourrez ensuite déployer sur un serveur statique ou intégrer à votre API Gateway pour servir les fichiers.
 
-## Architecture
+Technologies Utilisées
+React : Framework principal pour le développement de l’interface.
 
-chat-app/
-│── src/               # Code source React
-│   ├── components/    # Composants réutilisables (Boutons, Formulaires, Modals)
-│   ├── pages/         # Pages principales (Login, Register, Home, Chat)
-│   ├── services/      # Gestion des requêtes API (authentification, récupération des channels)
-│   ├── context/       # Gestion du contexte global (authentification, état du chat)
-│   ├── hooks/         # Hooks personnalisés (gestion du JWT, requêtes API)
-│   ├── utils/         # Fonctions utilitaires (formatage, validation, sécurité)
-│   ├── styles/        # Fichiers de styles (CSS, SCSS ou styled-components)
-│   ├── routers/       # Configuration de React Router
-│   ├── App.js         # Point d’entrée de l’application
-│   ├── index.js       # Rendu React et intégration du router
-    │── setupTests.js  # Fichier de configuration pour les tests
-│── public/            # Fichiers statiques (index.html, favicon)
-│── package.json       # Dépendances et scripts de l’application
-│── .env               # Variables d’environnement (URL API, clés secrètes)
-│── README.md          # Documentation du projet
+React Router : Pour la gestion de la navigation.
 
-📂 private-message-service/ (Microservice dédié aux messages privés)
- ├── 📜 server.js → Fichier principal du serveur
- ├── 📜 .env → Variables d'environnement (ports, clés)
+Socket.io Client : Pour les mises à jour en temps réel.
 
-📂 security/ (Gestion du cryptage RSA)
- │ ├── 📜 cryptoUtils.js → Fonctions de chiffrement/déchiffrement
- │ ├── 📂 keys/ → Stockage sécurisé des clés RSA
- │ ├── 🔑 private.pem → Clé privée RSA-2
- │ ├── 🔓 public.pem → Clé publique RSA-2
+Axios (ou fetch) : Pour les appels HTTP vers le backend.
 
-📂 db/ (Connexion et requêtes MySQL)
- │ ├── 📜 db.js → Gestion des connexions à MySQL
+CSS/SCSS : Pour le style des composants et pages.
 
-📂 api/ (Définition des routes API)
- │ ├── 📜 privateMessageRoutes.js → Routes pour les messages privés
+ESLint & Prettier : Pour le linting et le formatage du code.
 
-📂 controllers/ (Gestion des fonctionnalités)
- │ ├── 📜 privateMessageController.js → Logique d'envoi/réception des MP
-
-📂 middleware/ (Protection et validation des requêtes)
- │ ├── 📜 authMiddleware.js → Vérification du JWT
- │ ├── 📜 verifyAuthor.js → Vérification du propriétaire du MP
-
-📂 sockets/ (Gestion du temps réel)
- │ ├── 📜 privateMessageSocket.js → Événements WebSocket pour MP
+Licence
+Ce projet est sous licence MIT.
+---
