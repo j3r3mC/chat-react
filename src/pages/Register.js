@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import '../styles/register.css';  // Import global des styles
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -27,16 +28,20 @@ function Register() {
   };
 
   return (
-    <div>
+    <section className="register-section flex-column-center">
+    <div className="register-container flex-column-center neon-box">
+      <h1> Bienvenu sur J-Chat</h1>
       <h2>Inscription</h2>
-      <form onSubmit={handleRegister}>
+      <p>Bonjour, inscrivez-vous pour commencer à discuter !</p>
+      <form onSubmit={handleRegister} className="formulaire flex-column-center">
         <input type="text" placeholder="Nom d'utilisateur" value={username} onChange={(e) => setUsername(e.target.value)} required />
         <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input type="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit">S'inscrire</button>
       </form>
-      <p>Déjà inscrit ? <a href="/login">Se connecter</a></p>
+      <p>Déjà inscrit ? <a href="/">Se connecter</a></p>
     </div>
+    </section>
   );
 }
 

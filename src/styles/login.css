@@ -1,0 +1,79 @@
+.login-section{
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background-image: url('../../public/assets/backgrounds/J-script-logo.png');
+    background-size: fill;
+    background-position:center center;
+    background-repeat: no-repeat;
+    background-color: #0E1013;
+}
+
+.login-section .login-container {
+    height: max-content;
+    width: max-content;
+    padding: 3rem;
+    border-radius: 1rem;
+    background-color: rgba(0, 92, 106, 0.40);
+    backdrop-filter: blur(15px);
+    color: white;
+
+}
+.neon-box {
+  border: 1px solid plum;
+  box-shadow: 
+    0 0 5px plum,
+    0 0 10px plum,
+    0 0 20px plum,
+    0 0 30px plum,
+    0 0 40px plum;
+}
+
+
+.login-section .login-container .formulaire{
+    gap: 2rem;
+}
+
+.login-section .login-container a{
+    color: plum;
+    text-decoration: none;
+}
+
+.login-section .login-container a:hover{
+    color: white;
+}
+
+.login-section .login-container .formulaire input{
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    background-color: rgba(221, 160, 221, 0.25);
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+
+}
+.login-section .login-container .formulaire input::placeholder{
+    color: rgb(180, 180, 180);
+    outline: none;
+}
+
+.login-section .login-container .formulaire input:focus{
+    outline: none;
+    border: 1px solid plum;
+}
+
+.login-section .login-container .formulaire button{
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    background-color: #2d0231;
+    color: white;
+    font-weight: bold;
+}
+.login-section .login-container .formulaire button:hover{
+    background-color: white;
+    color: #2d0231;
+}
