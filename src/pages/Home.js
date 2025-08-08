@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/home.css"; // Import des styles spécifiques à la page d'accueil
 
 // Fonction pour regrouper les messages privés par interlocuteur
 // On considère que si l'utilisateur courant est l'expéditeur, l'interlocuteur est le destinataire, sinon inversement.
@@ -172,16 +173,18 @@ const fetchPrivateChats = async () => {
   };
 
   return (
-    <div>
-      <h2>Bienvenue ! 🎉</h2>
-
+    <div className="home-container">
+      <h1>Accueil</h1>
+     
+      <div className="section-container">
       {/* Liste des utilisateurs */}
       <section>
         <h3>Utilisateurs Inscrits</h3>
         <ul>
           {users.map((user) => (
             <li key={user.id}>
-              {user.username}{" "}
+              <p>
+              {user.username}</p>
               <button onClick={() => navigate(`/private-chat/${user.id}`)}>💬 MP</button>
               {role === "admin" && (
                 <button onClick={() => deleteUser(user.id)}>❌ Supprimer</button>
@@ -191,7 +194,34 @@ const fetchPrivateChats = async () => {
         </ul>
       </section>
 
-      {/* Liste des discussions privées */}
+    
+
+      {/* Liste des channels */}
+      <section>
+        <h3>Liste des Channels</h3>
+        <ul>
+          {channels.map((channel) => (
+            <li key={channel.id} style={{ marginBottom: "1rem" }}>
+              <p>
+              <span>
+                {channel.name} - {channel.type} - {channel.access}
+              </span></p>{" "}  
+              {joinedChannels.includes(channel.id) ? (
+                <button onClick={() => navigate(`/chat/${channel.id}`)}>Entrer</button>
+              ) : (
+                <button onClick={() => joinChannel(channel.id)}>Rejoindre</button>
+              )}
+              {role === "admin" && (
+                <button onClick={() => deleteChannel(channel.id)}>❌ Supprimer</button>
+              )}
+            </li>
+          ))}
+        </ul>
+        {role === "admin" && (
+          <button onClick={() => navigate("/create-channel")}>Créer un Channel</button>
+        )}
+      </section>
+        {/* Liste des discussions privées */}
       {/* Liste des discussions privées */}
 <section>
   <h3>💬 Discussions Privées</h3>
@@ -210,31 +240,7 @@ const fetchPrivateChats = async () => {
   )}
 </section>
 
-
-      {/* Liste des channels */}
-      <section>
-        <h3>Liste des Channels</h3>
-        <ul>
-          {channels.map((channel) => (
-            <li key={channel.id} style={{ marginBottom: "1rem" }}>
-              <span>
-                {channel.name} - {channel.type} - {channel.access}
-              </span>{" "}
-              {joinedChannels.includes(channel.id) ? (
-                <button onClick={() => navigate(`/chat/${channel.id}`)}>Entrer</button>
-              ) : (
-                <button onClick={() => joinChannel(channel.id)}>Rejoindre</button>
-              )}
-              {role === "admin" && (
-                <button onClick={() => deleteChannel(channel.id)}>❌ Supprimer</button>
-              )}
-            </li>
-          ))}
-        </ul>
-        {role === "admin" && (
-          <button onClick={() => navigate("/create-channel")}>Créer un Channel</button>
-        )}
-      </section>
+      </div>  
     </div>
   );
 }
