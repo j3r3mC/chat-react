@@ -16,11 +16,24 @@
     justify-content: start;
 }
 .home-container h1 {
-    font-size: 2rem;
-    font-family: 'Numans', sans-serif;
-    font-weight: 600;
+  font-size: 2rem;
+  font-family: 'Numans', sans-serif;
+  font-weight: 600;
+  color: white;
+  margin-top: 2rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: rgba(0, 92, 106, 0.40);
+  backdrop-filter: blur(15px);
+  border: #016BAA 2px solid;
+}
+
+.home-container .welcome-message {
+    font-size: 1.2rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
     color: white;
-    margin-top: 2rem;
+    margin: 1rem 0;
     padding: 1rem;
     border-radius: 1rem;
     background-color: rgba(0, 92, 106, 0.40);
@@ -29,7 +42,7 @@
 
 .home-container section {
     height: max-content;
-    min-height: 657px;
+    min-height: 550px;
     width: max-content;
     padding: 3rem;
     border-radius: 1rem;
@@ -54,7 +67,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
+    gap: 1rem;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     background-color: rgba(221, 160, 221, 0.15);

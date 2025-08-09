@@ -173,8 +173,13 @@ const fetchPrivateChats = async () => {
   };
 
   return (
-    <div className="home-container">
-      <h1>Accueil</h1>
+<div className="home-container">
+  <h1>Accueil</h1>
+  {/* 👋 Message de bienvenue personnalisé */}
+  <p className="welcome-message">
+    Bienvenue cher {role === "admin" ? "administrateur" : users.find(u => String(u.id) === String(JSON.parse(atob(localStorage.getItem("token").split(".")[1])).id))?.username || "utilisateur"} !
+  </p>
+
      
       <div className="section-container">
       {/* Liste des utilisateurs */}
